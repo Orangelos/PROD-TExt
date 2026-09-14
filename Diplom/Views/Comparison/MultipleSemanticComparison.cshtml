@@ -1,0 +1,237 @@
+﻿@model Diplom.Models.MultipleSemanticComparisonResult
+
+<link rel="stylesheet" href="~/css/site.css" />
+
+<style>
+    .summary-table {
+        width: 100%;
+        max-width: 650px;
+        margin: 0 auto;
+    }
+
+    .overall-table {
+        width: 100%;
+        max-width: 800px;
+        margin: 0 auto;
+        font-size: 1.1rem;
+    }
+
+        .overall-table td, .overall-table th {
+            vertical-align: middle;
+        }
+</style>
+
+<div class="container" style="max-width: 960px; margin: 30px auto;">
+    <h2 class="text-center mb-1">Семантическое сравнение (все методы)</h2>
+    <p class="text-center text-muted">
+        <strong>@Model.FileName1</strong> (@Model.UploadedAt1.ToString("dd.MM.yyyy HH:mm"))
+        и
+        <strong>@Model.FileName2</strong> (@Model.UploadedAt2.ToString("dd.MM.yyyy HH:mm"))
+    </p>
+    <hr />
+
+    @foreach (var res in Model.MethodResults)
+    {
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">Метод: @res.Method <span class="badge bg-secondary ms-2">размерность @(res.VectorSize > 0 ? res.VectorSize : "ошибка")</span></h5>
+            </div>
+            <div class="card-body">
+                @if (res.VectorSize <= 0)
+                {
+                    <p class="text-danger">Не удалось получить вектор для этой модели.</p>
+                }
+                else
+                {
+                    <table class="table table-sm table-bordered summary-table">
+                        @{
+                            int GetSimilarityLevel(double value, double highTh, double medTh, bool smallerIsBetter)
+                            {
+                                if (smallerIsBetter)
+                                {
+                                    if (value <= highTh) return 1;
+                                    if (value <= medTh) return 2;
+                                    return 0;
+                                }
+                                else
+                                {
+                                    if (value >= highTh) return 1;
+                                    if (value >= medTh) return 2;
+                                    return 0;
+                                }
+                            }
+
+                            string GetRowStyle(int level)
+                            {
+                                if (level == 1) return "background-color: #ffcccc;";
+                                if (level == 2) return "background-color: #fff3cd;";
+                                return "";
+                            }
+
+                            // Пороги для L2‑нормализованных векторов
+                            int cosLevel = GetSimilarityLevel(res.CosineSimilarity, 0.9, 0.7, false);
+                            int manhLevel = GetSimilarityLevel(res.ManhattanDistance, 0.3, 0.9, true);
+                            int eucLevel = GetSimilarityLevel(res.EuclideanDistance, 0.2, 0.5, true);
+                            int jacLevel = GetSimilarityLevel(res.JaccardCoefficient, 0.7, 0.5, false);
+                            int minkLevel = GetSimilarityLevel(res.MinkowskiDistance, 0.15, 0.3, true);
+                            int chebLevel = GetSimilarityLevel(res.ChebyshevDistance, 0.05, 0.15, true);
+                            int pearLevel = GetSimilarityLevel(res.PearsonCorrelation, 0.9, 0.7, false);
+                            int spearLevel = (res.Method != "TF" && res.Method != "TFIDF")
+                                             ? GetSimilarityLevel(res.SpearmanCorrelation, 0.9, 0.7, false)
+                                             : 0;
+                        }
+
+                        <tr style="@GetRowStyle(cosLevel)">
+                            <td>Косинусное сходство</td>
+                            <td class="text-end">@res.CosineSimilarity.ToString("F6")</td>
+                            <td>≥0.9 высокое; 0.7–0.9 среднее; &lt;0.7 низкое</td>
+                        </tr>
+                        <tr style="@GetRowStyle(manhLevel)">
+                            <td>Манхэттенское расстояние</td>
+                            <td class="text-end">@res.ManhattanDistance.ToString("F2")</td>
+                            <td>≤0.3 высокое; ≤0.9 среднее; &gt;0.9 низкое</td>
+                        </tr>
+                        <tr style="@GetRowStyle(eucLevel)">
+                            <td>Евклидово расстояние</td>
+                            <td class="text-end">@res.EuclideanDistance.ToString("F2")</td>
+                            <td>≤0.2 высокое; ≤0.5 среднее; &gt;0.5 низкое</td>
+                        </tr>
+                        <tr style="@GetRowStyle(jacLevel)">
+                            <td>Обобщ. коэф. Жаккарда</td>
+                            <td class="text-end">@res.JaccardCoefficient.ToString("F6")</td>
+                            <td>≥0.7 высокое; 0.5–0.7 среднее; &lt;0.5 низкое</td>
+                        </tr>
+                        <tr style="@GetRowStyle(minkLevel)">
+                            <td>Минковский (p=3)</td>
+                            <td class="text-end">@res.MinkowskiDistance.ToString("F2")</td>
+                            <td>≤0.15 высокое; ≤0.3 среднее; &gt;0.3 низкое</td>
+                        </tr>
+                        <tr style="@GetRowStyle(chebLevel)">
+                            <td>Чебышев</td>
+                            <td class="text-end">@res.ChebyshevDistance.ToString("F2")</td>
+                            <td>≤0.05 высокое; ≤0.15 среднее; &gt;0.15 низкое</td>
+                        </tr>
+                        <tr style="@GetRowStyle(pearLevel)">
+                            <td>Корреляция Пирсона</td>
+                            <td class="text-end">@res.PearsonCorrelation.ToString("F6")</td>
+                            <td>≥0.9 высокое; 0.7–0.9 среднее; &lt;0.7 низкое</td>
+                        </tr>
+
+                        @if (res.Method != "TF" && res.Method != "TFIDF")
+                        {
+                            <tr style="@GetRowStyle(spearLevel)">
+                                <td>Корреляция Спирмена</td>
+                                <td class="text-end">@res.SpearmanCorrelation.ToString("F6")</td>
+                                <td>≥0.9 высокое; 0.7–0.9 среднее; &lt;0.7 низкое</td>
+                            </tr>
+                        }
+                    </table>
+                }
+            </div>
+        </div>
+    }
+
+    @* ========== ИТОГОВАЯ СВОДКА (нейросетевые методы) с улучшенным масштабированием ========== *@
+    @{
+        var neuralResults = Model.MethodResults
+            .Where(r => r.VectorSize > 0 && r.Method != "TF" && r.Method != "TFIDF")
+            .ToList();
+        int neuralCount = neuralResults.Count;
+
+        double avgCosine = neuralCount > 0 ? neuralResults.Average(r => r.CosineSimilarity) : 0;
+        double avgJaccard = neuralCount > 0 ? neuralResults.Average(r => r.JaccardCoefficient) : 0;
+        double avgPearson = neuralCount > 0 ? neuralResults.Average(r => r.PearsonCorrelation) : 0;
+        double avgManhattan = neuralCount > 0 ? neuralResults.Average(r => r.ManhattanDistance) : 0;
+        double avgEuclidean = neuralCount > 0 ? neuralResults.Average(r => r.EuclideanDistance) : 0;
+        double avgMinkowski = neuralCount > 0 ? neuralResults.Average(r => r.MinkowskiDistance) : 0;
+        double avgChebyshev = neuralCount > 0 ? neuralResults.Average(r => r.ChebyshevDistance) : 0;
+
+        // Функция масштабирования сходств: [minRef, maxRef] -> [10%, 98%]
+        // minRef – типичное значение для непохожих, maxRef – для очень похожих
+        double ScaleSimilarity(double value, double minRef, double maxRef)
+        {
+            if (value <= minRef) return 10.0;
+            if (value >= maxRef) return 98.0;
+            return 10.0 + (value - minRef) / (maxRef - minRef) * 88.0; // 88 = 98-10
+        }
+
+        // Функция масштабирования расстояний: [maxRef, minRef] -> [10%, 98%]
+        // maxRef – расстояние для непохожих, minRef – для очень похожих
+        double ScaleDistance(double value, double minRef, double maxRef)
+        {
+            if (value <= minRef) return 98.0;
+            if (value >= maxRef) return 10.0;
+            return 10.0 + (maxRef - value) / (maxRef - minRef) * 88.0;
+        }
+
+        // Опорные точки подобраны по вашим данным
+        double cosPercent = ScaleSimilarity(avgCosine, 0.4, 0.95);        // косинус: 0.4 → 10%, 0.95 → 98%
+        double jacPercent = ScaleSimilarity(avgJaccard, 0.3, 0.8);        // Жаккард: 0.3 → 10%, 0.8 → 98%
+        double pearPercent = ScaleSimilarity(avgPearson, 0.3, 0.95);      // Пирсон: 0.3 → 10%, 0.95 → 98%
+
+        double manhSimilarity = ScaleDistance(avgManhattan, 5.0, 30.0);    // Манхэттен: ≤5 → 98%, ≥30 → 10%
+        double eucSimilarity = ScaleDistance(avgEuclidean, 0.3, 1.2);     // Евклид: ≤0.3 → 98%, ≥1.2 → 10%
+        double minkSimilarity = ScaleDistance(avgMinkowski, 0.12, 0.45);   // Минковский: ≤0.12 → 98%, ≥0.45 → 10%
+        double chebSimilarity = ScaleDistance(avgChebyshev, 0.03, 0.15);   // Чебышев: ≤0.03 → 98%, ≥0.15 → 10%
+
+        double overallSimilarity = new[] { cosPercent, jacPercent, pearPercent,
+                                  manhSimilarity, eucSimilarity, minkSimilarity, chebSimilarity }.Average();
+    }
+
+    @if (neuralCount > 0)
+    {
+        <div class="card shadow-sm mt-4">
+            <div class="card-header bg-info text-white">
+                <h4 class="mb-0">Общее семантическое сходство (нейросетевые методы)</h4>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm table-bordered overall-table">
+                    <thead class="table-light">
+                        <tr><th>Метрика</th><th class="text-end">Значение</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Общий процент сходства</strong></td>
+                            <td class="text-end"><strong>@overallSimilarity.ToString("F1")%</strong></td>
+                        </tr>
+                        <tr>
+                            <td>Косинусное сходство (усреднённое)</td>
+                            <td class="text-end">@cosPercent.ToString("F1")%</td>
+                        </tr>
+                        <tr>
+                            <td>Коэффициент Жаккарда (усреднённый)</td>
+                            <td class="text-end">@jacPercent.ToString("F1")%</td>
+                        </tr>
+                        <tr>
+                            <td>Корреляция Пирсона (усреднённая)</td>
+                            <td class="text-end">@pearPercent.ToString("F1")%</td>
+                        </tr>
+                        <tr>
+                            <td>Сходство по Манхэттену</td>
+                            <td class="text-end">@manhSimilarity.ToString("F1")%</td>
+                        </tr>
+                        <tr>
+                            <td>Сходство по Евклиду</td>
+                            <td class="text-end">@eucSimilarity.ToString("F1")%</td>
+                        </tr>
+                        <tr>
+                            <td>Сходство по Минковскому</td>
+                            <td class="text-end">@minkSimilarity.ToString("F1")%</td>
+                        </tr>
+                        <tr>
+                            <td>Сходство по Чебышеву</td>
+                            <td class="text-end">@chebSimilarity.ToString("F1")%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+    else
+    {
+        <p class="text-center text-muted">Нет успешно обработанных нейросетевых методов для построения сводки.</p>
+    }
+    <div class="mt-3 text-center">
+        <a href="javascript:history.back()" class="btn btn-secondary">Назад</a>
+    </div>
+</div>

@@ -1,0 +1,67 @@
+is_global = true
+build_property.TargetFramework = net10.0
+build_property.TargetFramework = net10.0
+build_property.TargetPlatformMinVersion = 
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.TargetFrameworkIdentifier = .NETCoreApp
+build_property.TargetFrameworkVersion = v10.0
+build_property.RootNamespace = Diplom
+build_property.RootNamespace = Diplom
+build_property.ProjectDir = C:\Users\Arina\Desktop\Диплом\Diplom\Diplom\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 9.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = C:\Users\Arina\Desktop\Диплом\Diplom\Diplom
+build_property._RazorSourceGeneratorDebug = 
+build_property.EffectiveAnalysisLevelStyle = 10.0
+build_property.EnableCodeStyleSeverity = 
+
+[C:/Users/Arina/Desktop/Диплом/Diplom/Diplom/Views/Analysis/StructuralAnalysis.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQW5hbHlzaXNcU3RydWN0dXJhbEFuYWx5c2lzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Arina/Desktop/Диплом/Diplom/Diplom/Views/Comparison/MultipleSemanticComparison.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29tcGFyaXNvblxNdWx0aXBsZVNlbWFudGljQ29tcGFyaXNvbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Arina/Desktop/Диплом/Diplom/Diplom/Views/Comparison/StructuralComparison.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29tcGFyaXNvblxTdHJ1Y3R1cmFsQ29tcGFyaXNvbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Arina/Desktop/Диплом/Diplom/Diplom/Views/Home/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Arina/Desktop/Диплом/Diplom/Diplom/Views/TextFiles/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGV4dEZpbGVzXENyZWF0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Arina/Desktop/Диплом/Diplom/Diplom/Views/TextFiles/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGV4dEZpbGVzXERlbGV0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Arina/Desktop/Диплом/Diplom/Diplom/Views/TextFiles/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGV4dEZpbGVzXERldGFpbHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Arina/Desktop/Диплом/Diplom/Diplom/Views/TextFiles/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGV4dEZpbGVzXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Arina/Desktop/Диплом/Diplom/Diplom/Views/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 

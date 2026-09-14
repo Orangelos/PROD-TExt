@@ -1,0 +1,343 @@
+﻿@model IEnumerable<Diplom.Models.TextFile>
+
+<link rel="stylesheet" href="~/css/site.css" />
+
+<!-- Центрированный блок с заголовком и кнопками загрузки -->
+<div class="welcome-card">
+    <h1>Добро пожаловать</h1>
+    <p>Нажмите кнопку, чтобы загрузить текстовый файл в базу данных.</p>
+    <div>
+        <a asp-controller="TextFiles" asp-action="Create" class="btn btn-primary btn-lg">Загрузить файл</a>
+        <a asp-controller="TextFiles" asp-action="Index" class="btn btn-secondary btn-lg">Просмотреть все файлы</a>
+    </div>
+</div>
+
+<!-- Глобальные кнопки сравнения -->
+<div class="welcome-card" style="margin-top: 20px;">
+    <div class="analysis-buttons">
+        <button class="btn btn-analysis-global btn-structural-compare disabled" style="pointer-events: none; opacity: 0.5;">Структурное сравнение</button>
+        <button class="btn btn-analysis-global btn-semantic-compare disabled" style="pointer-events: none; opacity: 0.5;">Семантическое сравнение</button>
+    </div>
+    <p id="selection-info" style="margin-top:10px; color:#666;">Выберите ровно 2 файла для сравнения</p>
+</div>
+
+<h2 style="text-align: center; margin: 30px 0 10px;">Список файлов</h2>
+
+<div class="file-card">
+    @if (!Model.Any())
+    {
+        <p>Файлов пока нет. Загрузите первый файл.</p>
+    }
+    else
+    {
+        <table class="table table-striped analysis-table">
+            <thead>
+                <tr>
+                    <th style="width: 40px;">Выбор</th>
+                    <th>Название файла</th>
+                    <th>Дата загрузки</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var file in Model)
+                {
+                    <tr>
+                        <td style="text-align:center;">
+                            <input type="checkbox" class="file-checkbox" value="@file.Id" />
+                        </td>
+                        <td>
+                            <a asp-controller="TextFiles" asp-action="Details" asp-route-id="@file.Id" class="file-link">
+                                @file.FileName
+                            </a>
+                        </td>
+                        <td>@file.UploadedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                        <td>
+                            <a asp-controller="Analysis" asp-action="StructuralAnalysis" asp-route-id="@file.Id" class="btn btn-analysis-struct">Структурный анализ</a>
+                       
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+<style>
+    /* Центрированный блок для приветствия и глобальных кнопок */
+    .welcome-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        padding: 30px 20px 20px;
+        margin: 40px auto 0;
+        max-width: 900px;
+        border: 1px solid #e2e8f0;
+        text-align: center;
+    }
+
+        .welcome-card h1 {
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .welcome-card p {
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+    /* Глобальные кнопки */
+    .analysis-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+    }
+
+    .btn-analysis-global {
+        border: 2px solid;
+        background: transparent;
+        color: inherit;
+        padding: 8px 32px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        border-radius: 8px;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        position: relative;
+        top: 0;
+        box-shadow: none;
+    }
+
+        .btn-analysis-global:active {
+            top: 2px;
+            box-shadow: none;
+        }
+
+        .btn-analysis-global.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+    /* Структурное сравнение */
+    .btn-structural-compare {
+        border-color: #2C2C2C;
+        color: #2C2C2C;
+    }
+
+        .btn-structural-compare:hover:not(.disabled) {
+            background: linear-gradient(135deg, #2C2C2C, #1A1A1A);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+    /* Семантическое сравнение */
+    .btn-semantic-compare {
+        border-color: #5A5A5A;
+        color: #5A5A5A;
+    }
+
+        .btn-semantic-compare:hover:not(.disabled) {
+            background: linear-gradient(135deg, #5A5A5A, #4A4A4A);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+    /* Карточка для таблицы */
+    .file-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        padding: 20px 20px 10px 20px;
+        margin: 20px auto;
+        border: 1px solid #e2e8f0;
+        max-width: 900px;
+    }
+
+    /* Таблица */
+    .analysis-table {
+        margin: 0;
+        width: 100%;
+    }
+
+        .analysis-table th, .analysis-table td {
+            vertical-align: middle;
+            text-align: center;
+            padding: 14px 12px;
+        }
+
+            .analysis-table th:first-child, .analysis-table td:first-child {
+                text-align: center;
+                width: 40px;
+            }
+
+            .analysis-table th:nth-child(2), .analysis-table td:nth-child(2) {
+                text-align: left;
+            }
+
+    /* Чекбокс */
+    .file-checkbox {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+    }
+
+    /* Ссылка на имя файла */
+    .file-link {
+        color: inherit;
+        text-decoration: none;
+        border-bottom: 1px dotted transparent;
+        transition: border-color 0.2s, color 0.2s;
+    }
+
+        .file-link:hover {
+            color: #2C2C2C;
+            border-bottom-color: #2C2C2C;
+            text-decoration: none;
+        }
+
+    /* Кнопки в таблице (действия над одним файлом) */
+    .btn-analysis-struct, .btn-analysis-semantic {
+        display: inline-block;
+        padding: 8px 18px;
+        margin: 0 6px;
+        font-size: 1rem;
+        font-weight: 500;
+        border-radius: 8px;
+        text-decoration: none;
+        border: 2px solid;
+        min-width: 150px;
+        text-align: center;
+        background: transparent;
+        color: inherit;
+        transition: all 0.2s ease;
+        box-shadow: none;
+        position: relative;
+        top: 0;
+    }
+
+        .btn-analysis-struct:hover, .btn-analysis-semantic:hover {
+            color: white;
+        }
+
+        .btn-analysis-struct:active, .btn-analysis-semantic:active {
+            top: 2px;
+            box-shadow: none;
+        }
+
+    .btn-analysis-struct {
+        border-color: #2C2C2C;
+        color: #2C2C2C;
+    }
+
+        .btn-analysis-struct:hover {
+            background: linear-gradient(135deg, #2C2C2C, #1A1A1A);
+            border-color: #2C2C2C;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+    .btn-analysis-semantic {
+        border-color: #5A5A5A;
+        color: #5A5A5A;
+    }
+
+        .btn-analysis-semantic:hover:not(.disabled) {
+            background: linear-gradient(135deg, #5A5A5A, #4A4A4A);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+    /* Адаптив */
+    @@media (max-width: 768px) {
+        .btn-analysis-struct, .btn-analysis-semantic {
+            min-width: 120px;
+            padding: 6px 12px;
+            font-size: 0.85rem;
+        }
+
+        .file-card, .welcome-card {
+            padding: 15px;
+            max-width: 100%;
+        }
+
+        .btn-analysis-global {
+            padding: 6px 20px;
+            font-size: 0.85rem;
+        }
+
+        .welcome-card {
+            margin-top: 20px;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const checkboxes = document.querySelectorAll('.file-checkbox');
+        const maxAllowed = 2;
+        const structBtn = document.querySelector('.btn-structural-compare');
+        const semanticBtn = document.querySelector('.btn-semantic-compare');
+        const infoText = document.getElementById('selection-info');
+
+        function updateCompareButtons() {
+            const checkedCount = document.querySelectorAll('.file-checkbox:checked').length;
+            const isTwoSelected = (checkedCount === 2);
+
+            [structBtn, semanticBtn].forEach(btn => {
+                if (isTwoSelected) {
+                    btn.classList.remove('disabled');
+                    btn.style.pointerEvents = 'auto';
+                    btn.style.opacity = '1';
+                } else {
+                    btn.classList.add('disabled');
+                    btn.style.pointerEvents = 'none';
+                    btn.style.opacity = '0.5';
+                }
+            });
+
+            if (infoText) {
+                infoText.textContent = isTwoSelected
+                    ? 'Можно выполнить сравнение'
+                    : 'Выберите ровно 2 файла для сравнения';
+            }
+        }
+
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', function () {
+                const checked = document.querySelectorAll('.file-checkbox:checked');
+                if (checked.length > maxAllowed) {
+                    this.checked = false;
+                    alert('Можно выбрать максимум 2 файла для сравнения.');
+                }
+                updateCompareButtons();
+            });
+        });
+
+        // Начальное состояние
+        updateCompareButtons();
+
+        // Обработчики кликов по глобальным кнопкам сравнения
+        function getSelectedIds() {
+            return Array.from(document.querySelectorAll('.file-checkbox:checked'))
+                        .map(cb => cb.value);
+        }
+
+        structBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            const ids = getSelectedIds();
+            if (ids.length === 2) {
+               window.location.href = `/Comparison/StructuralComparison?ids=${ids.join(',')}`;
+            }
+        });
+
+            semanticBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        const ids = getSelectedIds();
+        if (ids.length === 2) {
+            window.location.href = `/Comparison/FullSemanticComparison?ids=${ids.join(',')}`;
+        }
+    });
+    });
+</script>

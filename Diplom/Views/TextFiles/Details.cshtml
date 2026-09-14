@@ -1,0 +1,17 @@
+﻿@model Diplom.Models.TextFile
+
+<link rel="stylesheet" href="~/css/site.css" />
+
+<div class="container">
+    <h2>@Model.FileName</h2>
+    <p><strong>Дата загрузки:</strong> @Model.UploadedAt.ToString("dd.MM.yyyy HH:mm")</p>
+    <hr />
+    <div class="content-view">
+        <pre>@Model.Content</pre>
+    </div>
+    <div>
+
+        <!-- Кнопка «Назад» с использованием истории браузера -->
+        <a href="javascript:history.back()" class="btn btn-secondary">Назад</a>
+    </div>
+</div>

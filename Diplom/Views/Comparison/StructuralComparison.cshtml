@@ -1,0 +1,188 @@
+﻿@model Diplom.Models.StructuralComparisonResult
+
+<link rel="stylesheet" href="~/css/site.css" />
+
+<style>
+    .comparison-table {
+        width: 100%;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+        .comparison-table th, .comparison-table td {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+            .comparison-table td:first-child {
+                text-align: left;
+            }
+
+    .summary-table {
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+</style>
+
+<div class="container" style="max-width: 960px; margin: 30px auto;">
+    <h2 class="text-center mb-1">Структурное сравнение</h2>
+    <p class="text-center text-muted">
+        <strong>@Model.FileName1</strong> (@Model.UploadedAt1.ToString("dd.MM.yyyy HH:mm"))
+        и
+        <strong>@Model.FileName2</strong> (@Model.UploadedAt2.ToString("dd.MM.yyyy HH:mm"))
+    </p>
+    <hr />
+
+    <h3 class="mb-3 text-center">Сравнение метрик</h3>
+    <div class="table-responsive">
+        <table class="table table-sm table-bordered comparison-table">
+            <thead class="table-light">
+                <tr><th>Метрика</th><th>@Model.FileName1</th><th>@Model.FileName2</th><th>Разница, %</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var m in Model.Metrics)
+                {
+                    string bgColor = "";
+                    if (m.DiffPercent < 3.0) bgColor = "#ffcccc";
+                    else if (m.DiffPercent < 6.0) bgColor = "#fff3cd";
+                    <tr style="background-color: @bgColor;">
+                        <td>@m.Name</td>
+                        <td>@m.Value1.ToString("F2")</td>
+                        <td>@m.Value2.ToString("F2")</td>
+                        <td>@m.DiffPercent.ToString("F1")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <p class="text-center">
+        <strong>
+            Средняя относительная разница по всем метрикам:
+            @((Model.Metrics.Any() ? Model.Metrics.Average(m => m.DiffPercent) : 0).ToString("F1"))%
+        </strong>
+        <br />
+        <strong>
+            Тексты структурно похожи на
+            @((Model.Metrics.Any() ? 100 - Model.Metrics.Average(m => m.DiffPercent) : 100).ToString("F1"))%
+        </strong>
+    </p>
+    <hr />
+    <div class="card shadow-sm mt-4">
+        <div class="card-header bg-white">
+            <h3 class="mb-0">Итоговые метрики сходства векторов</h3>
+        </div>
+        <div class="card-body">
+            <table class="table table-sm table-bordered summary-table">
+                <thead class="table-light">
+                    <tr><th>Метрика</th><th class="text-end">Значение</th><th>Референсные интервалы</th></tr>
+                </thead>
+                <tbody>
+                    @{
+                        int GetSimilarityLevel(double value, double highTh, double medTh, bool smallerIsBetter = false)
+                        {
+                            if (smallerIsBetter)
+                            {
+                                if (value <= highTh) return 1;
+                                if (value <= medTh) return 2;
+                                return 0;
+                            }
+                            else
+                            {
+                                if (value >= highTh) return 1;
+                                if (value >= medTh) return 2;
+                                return 0;
+                            }
+                        }
+                        string GetRowStyle(int level)
+                        {
+                            if (level == 1) return "background-color: #ffcccc;";
+                            if (level == 2) return "background-color: #fff3cd;";
+                            return "";
+                        }
+
+                        // Ваши подкрученные пороговые значения
+                        int cosLevel = GetSimilarityLevel(Model.CosineSimilarity, 0.92, 0.85);
+                        int manhLevel = GetSimilarityLevel(Model.ManhattanDistance, 8, 16, true);
+                        int eucLevel = GetSimilarityLevel(Model.EuclideanDistance, 3, 4, true);
+                        int jacLevel = GetSimilarityLevel(Model.JaccardCoefficient, 0.80, 0.60);
+                        int minkLevel = GetSimilarityLevel(Model.MinkowskiDistance, 1.8, 2.3, true);
+                        int chebLevel = GetSimilarityLevel(Model.ChebyshevDistance, 1.2, 1.5, true);
+                        int jeffLevel = GetSimilarityLevel(Model.JeffreyDivergence, 0.6, 0.7, true);
+                        int hellLevel = GetSimilarityLevel(Model.HellingerDistance, 0.17, 0.22, true);
+                        int bhatLevel = GetSimilarityLevel(Model.BhattacharyyaDistance, 0.03, 0.05, true);
+                        int pearLevel = GetSimilarityLevel(Model.PearsonCorrelation, -0.4, 0);
+                        int spearLevel = GetSimilarityLevel(Model.SpearmanCorrelation, -0.6, -0.5);
+                    }
+
+                    <tr style="@GetRowStyle(cosLevel)">
+                        <td>Косинусное сходство</td>
+                        <td class="text-end">@Model.CosineSimilarity.ToString("F6")</td>
+                        <td>≥0.92 высокое; 0.85–0.92 среднее; &lt;0.85 низкое</td>
+                    </tr>
+                    <tr style="@GetRowStyle(manhLevel)">
+                        <td>Манхэттенское расстояние</td>
+                        <td class="text-end">@Model.ManhattanDistance.ToString("F2")</td>
+                        <td>≤8 высокое; 8–16 среднее; &gt;16 низкое</td>
+                    </tr>
+                    <tr style="@GetRowStyle(eucLevel)">
+                        <td>Евклидово расстояние</td>
+                        <td class="text-end">@Model.EuclideanDistance.ToString("F2")</td>
+                        <td>≤3 высокое; 3–4 среднее; &gt;4 низкое</td>
+                    </tr>
+                    <tr style="@GetRowStyle(jacLevel)">
+                        <td>Обобщённый коэффициент Жаккарда</td>
+                        <td class="text-end">@Model.JaccardCoefficient.ToString("F6")</td>
+                        <td>≥0.80 высокое; 0.60–0.80 среднее; &lt;0.60 низкое</td>
+                    </tr>
+                    <tr style="@GetRowStyle(minkLevel)">
+                        <td>Минковский (p=3)</td>
+                        <td class="text-end">@Model.MinkowskiDistance.ToString("F2")</td>
+                        <td>≤1.8 высокое; 1.8–2.3 среднее; &gt;2.3 низкое</td>
+                    </tr>
+                    <tr style="@GetRowStyle(chebLevel)">
+                        <td>Чебышев</td>
+                        <td class="text-end">@Model.ChebyshevDistance.ToString("F2")</td>
+                        <td>≤1.2 высокое; 1.2–1.5 среднее; &gt;1.5 низкое</td>
+                    </tr>
+                    <tr style="@GetRowStyle(jeffLevel)">
+                        <td>Дивергенция Джеффри</td>
+                        <td class="text-end">@Model.JeffreyDivergence.ToString("F4")</td>
+                        <td>≤0.6 высокое; 0.6–0.7 среднее; &gt;0.7 низкое</td>
+                    </tr>
+                    <tr style="@GetRowStyle(hellLevel)">
+                        <td>Хеллингер</td>
+                        <td class="text-end">@Model.HellingerDistance.ToString("F6")</td>
+                        <td>≤0.17 высокое; 0.17–0.22 среднее; &gt;0.22 низкое</td>
+                    </tr>
+                    <tr style="@GetRowStyle(bhatLevel)">
+                        <td>Бхаттачария</td>
+                        <td class="text-end">@Model.BhattacharyyaDistance.ToString("F4")</td>
+                        <td>≤0.03 высокое; 0.03–0.05 среднее; &gt;0.05 низкое</td>
+                    </tr>
+                    <tr style="@GetRowStyle(pearLevel)">
+                        <td>Корреляция Пирсона</td>
+                        <td class="text-end">@Model.PearsonCorrelation.ToString("F6")</td>
+                        <td>≥-0.4 высокое; -0.4–0 среднее; &lt;0 низкое</td>
+                    </tr>
+                    <tr style="@GetRowStyle(spearLevel)">
+                        <td>Корреляция Спирмена</td>
+                        <td class="text-end">@Model.SpearmanCorrelation.ToString("F6")</td>
+                        <td>≥-0.6 высокое; -0.6–-0.5 среднее; &lt;-0.5 низкое</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p class="small text-muted text-center mt-2">
+                Цвет строки: <span style="background-color:#ffcccc;">&nbsp;&nbsp;&nbsp;</span> высокое сходство,
+                <span style="background-color:#fff3cd;">&nbsp;&nbsp;&nbsp;</span> среднее сходство.
+                Пороги заданы вручную на основе экспериментальных данных.
+            </p>
+        </div>
+    </div>
+
+
+   
+    <div class="mt-3 text-center">
+        <a href="javascript:history.back()" class="btn btn-secondary">Назад</a>
+    </div>
+</div>

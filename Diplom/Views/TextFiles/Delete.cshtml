@@ -1,0 +1,21 @@
+﻿@model Diplom.Models.TextFile
+
+<link rel="stylesheet" href="~/css/site.css" />
+
+<div class="container">
+    <h1>Удалить файл</h1>
+    <h3>Вы уверены, что хотите удалить этот файл?</h3>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">Название</dt>
+        <dd class="col-sm-10">@Model.FileName</dd>
+        <dt class="col-sm-2">Дата загрузки</dt>
+        <dd class="col-sm-10">@Model.UploadedAt.ToString("dd.MM.yyyy HH:mm")</dd>
+    </dl>
+
+    <form asp-action="Delete" method="post">
+        <input type="hidden" asp-for="Id" />
+        <button type="submit" class="btn btn-danger">Удалить</button>
+        <a asp-action="Index" class="btn btn-secondary">Отмена</a>
+    </form>
+</div>

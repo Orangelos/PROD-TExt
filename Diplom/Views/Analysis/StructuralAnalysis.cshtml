@@ -1,0 +1,221 @@
+﻿@model Diplom.Models.StructuralAnalysisResult
+
+<link rel="stylesheet" href="~/css/site.css" />
+
+<style>
+    .metric-table {
+        width: 500px;
+        margin: 0 auto;
+    }
+
+        .metric-table td:first-child {
+            width: 70%;
+            text-align: left;
+        }
+
+        .metric-table td:last-child {
+            width: 30%;
+            text-align: center;
+        }
+
+        .metric-table th {
+            text-align: center;
+            font-weight: bold;
+        }
+
+    .section-title {
+        font-size: 1.4rem;
+        margin-bottom: 0;
+    }
+
+    .subsection-title {
+        font-weight: bold;
+        margin-bottom: 8px;
+        text-align: center;
+    }
+</style>
+
+<div class="container" style="max-width: 950px; margin: 30px auto;">
+    <h2 class="mb-2 text-center">Структурный анализ: @Model.FileName</h2>
+    <p class="text-muted text-center">Дата загрузки: @Model.UploadedAt.ToString("dd.MM.yyyy HH:mm")</p>
+    <hr />
+
+    <!-- Основные показатели -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <h4 class="fw-bold section-title">Основные показатели</h4>
+        </div>
+        <div class="card-body">
+            <table class="table table-sm table-borderless metric-table">
+                <tr><td>Абзацев</td><td>@Model.ParagraphCount</td></tr>
+                <tr><td>Слов</td><td>@Model.WordCount</td></tr>
+                <tr><td>Букв</td><td>@Model.LetterCount</td></tr>
+                <tr><td>Предложений</td><td>@Model.SentenceCount</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- Средние длины -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <h4 class="fw-bold section-title">Средние длины</h4>
+        </div>
+        <div class="card-body">
+            <table class="table table-sm table-borderless metric-table">
+                <tr><td>Средняя длина абзаца (слов)</td><td>@Model.AvgParagraphLengthWords.ToString("F1")</td></tr>
+                <tr><td>Средняя длина абзаца (букв)</td><td>@Model.AvgParagraphLengthLetters.ToString("F1")</td></tr>
+                <tr><td>Средняя длина абзаца (предложений)</td><td>@Model.AvgParagraphLengthSentences.ToString("F1")</td></tr>
+                <tr><td>Средняя длина предложения (слов)</td><td>@Model.AvgSentenceLengthWords.ToString("F1")</td></tr>
+                <tr><td>Средняя длина предложения (слогов)</td><td>@Model.AvgSentenceLengthSyllables.ToString("F1")</td></tr>
+                <tr><td>Средняя длина предложения (букв)</td><td>@Model.AvgSentenceLengthLetters.ToString("F1")</td></tr>
+                <tr><td>Средняя длина слова (букв)</td><td>@Model.AvgWordLengthLetters.ToString("F2")</td></tr>
+                <tr><td>Средняя длина слова (слогов)</td><td>@Model.AvgWordLengthSyllables.ToString("F2")</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- Лексические характеристики -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <h4 class="fw-bold section-title">Лексические характеристики</h4>
+        </div>
+        <div class="card-body">
+            <table class="table table-sm table-borderless metric-table">
+                <tr><td>Уникальных слов (абс.)</td><td>@Model.UniqueWordCount</td></tr>
+                <tr><td>Уникальные слова (%)</td><td>@Model.PercentUniqueWords.ToString("F1")</td></tr>
+                <tr><td>Индекс Guiraud</td><td>@Model.GuiraudIndex.ToString("F3")</td></tr>
+                <tr><td>Средняя частота повторения</td><td>@Model.AvgWordFrequency.ToString("F2")</td></tr>
+                <tr><td>Односложные слова (%)</td><td>@Model.PercentSingleSyllableWords.ToString("F1")</td></tr>
+                <tr><td>Сложные слова (>3 слогов) (%)</td><td>@Model.PercentComplexWords.ToString("F1")</td></tr>
+            </table>
+        </div>
+    </div>
+    <!-- Индексы сложности -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <h4 class="fw-bold section-title">Индексы сложности</h4>
+        </div>
+        <div class="card-body">
+            <table class="table table-sm table-borderless metric-table">
+                <tr><td>Процент слов длиннее 6 букв</td><td>@Model.PercentLongWords.ToString("F1")</td></tr>
+                <tr><td>LIX</td><td>@Model.LIX.ToString("F2")</td></tr>
+                <tr><td>RIX</td><td>@Model.RIX.ToString("F2")</td></tr>
+                <tr><td>Энтропия частей речи</td><td>@Model.PoSEntropy.ToString("F3")</td></tr>
+                <tr><td>Индекс Honore</td><td>@Model.HonoreIndex.ToString("F2")</td></tr>
+            </table>
+        </div>
+    </div>
+    <!-- Распределение частей речи -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <h4 class="fw-bold section-title">Распределение частей речи</h4>
+        </div>
+        <div class="card-body">
+
+            <!-- Подсекция: доли частей речи (%) -->
+            <h5 class="subsection-title">Доли частей речи (%)</h5>
+            <table class="table table-sm table-bordered metric-table mb-4">
+                <tbody>
+                    <tr><td>Существительные</td><td>@Model.PercentNouns.ToString("F1")</td></tr>
+                    <tr><td>Глаголы</td><td>@Model.PercentVerbs.ToString("F1")</td></tr>
+                    <tr><td>Прилагательные</td><td>@Model.PercentAdjectives.ToString("F1")</td></tr>
+                    <tr><td>Наречия</td><td>@Model.PercentAdverbs.ToString("F1")</td></tr>
+                    <tr><td>Местоимения</td><td>@Model.PercentPronouns.ToString("F1")</td></tr>
+                    <tr><td>Числительные</td><td>@Model.PercentNumerals.ToString("F1")</td></tr>
+                    <tr><td>Предлоги</td><td>@Model.PercentPrepositions.ToString("F1")</td></tr>
+                    <tr><td>Союзы</td><td>@Model.PercentConjunctions.ToString("F1")</td></tr>
+                    <tr><td>Частицы</td><td>@Model.PercentParticles.ToString("F1")</td></tr>
+                    <tr><td>Междометия</td><td>@Model.PercentInterjections.ToString("F1")</td></tr>
+                    <tr><td>Причастия~</td><td>@Model.PercentParticiples.ToString("F1")</td></tr>
+                    <tr><td>Деепричастия~</td><td>@Model.PercentAdverbialParticiples.ToString("F1")</td></tr>
+                    <tr><td>Предикативы</td><td>@Model.PercentPredicatives.ToString("F1")</td></tr>
+                    <tr><td>Вводные слова</td><td>@Model.PercentParentheses.ToString("F1")</td></tr>
+                    <tr><td>Нераспознанные</td><td>@Model.PercentUnknown.ToString("F1")</td></tr>
+                    <tr class="table-light">
+                        <td>Знаменательные слова (%)</td>
+                        <td>@Model.PercentNotionalWords.ToString("F1")</></td>
+                    </tr>
+                    
+                </tbody>
+            </table>
+
+            <!-- Подсекция: служебные слова и разнообразие -->
+            <h5 class="subsection-title">Служебные слова и разнообразие</h5>
+            <table class="table table-sm table-borderless metric-table mb-0">
+                <tr><td>Служебные слова (сумма, %)</td><td>@Model.PercentFunctionWords.ToString("F1")</td></tr>
+                <tr><td>Уникальных союзов</td><td>@Model.UniqueConjunctions</td></tr>
+                <tr><td>Всего союзов</td><td>@Model.TotalConjunctions</td></tr>
+                <tr><td>Уникальных местоимений</td><td>@Model.UniquePronouns</td></tr>
+                <tr><td>Всего местоимений</td><td>@Model.TotalPronouns</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- Структура предложений -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <h4 class="fw-bold section-title">Структура предложений</h4>
+        </div>
+        <div class="card-body">
+            <table class="table table-sm table-borderless metric-table">
+                <tr><td>Мета-текстовых маркеров</td><td>@Model.MetaTextMarkersCount</td></tr>
+                <tr><td>Знаков препинания всего</td><td>@Model.TotalPunctuationMarks</td></tr>
+                <tr><td>Уникальных знаков препинания</td><td>@Model.UniquePunctuationMarks</td></tr>
+            <tr><td>Знаков препинания на 100 слов</td><td>@Model.PunctuationPer100Words.ToString("F1")</td></tr>
+                <tr><td>Вопросительные предложения (%)</td><td>@Model.PercentQuestionSentences.ToString("F1")</td></tr>
+                <tr><td>Восклицательные предложения (%)</td><td>@Model.PercentExclamatorySentences.ToString("F1")</td></tr>
+                <tr><td>Сложные предложения (%)</td><td>@Model.PercentComplexSentences.ToString("F1")</td></tr>
+            <tr><td>Аббревиатур</td><td>@Model.AbbreviationCount</td></tr>
+            <tr><td>Уникальных аббревиатур</td><td>@Model.AbbreviationList.Count</td></tr>
+            <tr><td>Предложения с прямой речью (%)</td><td>@Model.PercentDirectSpeechSentences.ToString("F1")</td></tr>
+            </table>
+        </div>
+    </div>
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-white">
+        <h4 class="fw-bold section-title">Вариативность абзацев</h4>
+    </div>
+    <div class="card-body">
+        <table class="table table-sm table-borderless metric-table">
+            <tr><td>Стандартное отклонение длин абзацев (слов)</td><td>@Model.StdDevParagraphLengthWords.ToString("F2")</td></tr>
+        </table>
+    </div>
+</div>
+    <!-- Индексы удобочитаемости -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <h4 class="fw-bold section-title">Индексы удобочитаемости</h4>
+        </div>
+        <div class="card-body">
+            <table class="table table-sm table-bordered metric-table">
+                <tr><td>Оборневой</td><td>@Model.ReadabilityOborneva.ToString("F2")</td></tr>
+                <tr><td>Тулдавы</td><td>@Model.ReadabilityTuldava.ToString("F2")</td></tr>
+                <tr><td>Колемана</td><td>@Model.ReadabilityColeman.ToString("F2")</td></tr>
+                <tr><td>ARI</td><td>@Model.ReadabilityARI.ToString("F2")</td></tr>
+                <tr><td>Флеш-Кинкейд (учеб.)</td><td>@Model.ReadabilityFleschKincaidEducational.ToString("F2")</td></tr>
+                <tr><td>Флеш-Кинкейд (худ.)</td><td>@Model.ReadabilityFleschKincaidFiction.ToString("F2")</td></tr>
+                <tr><td>Мацковского</td><td>@Model.ReadabilityMatskovsky.ToString("F2")</td></tr>
+                <tr><td>Дейл-Челл</td><td>@Model.ReadabilityDaleChall.ToString("F2")</td></tr>
+                <tr><td>Туманность Ганнинга</td><td>@Model.ReadabilityGunningFog.ToString("F2")</td></tr>
+                <tr><td>Пауэрс-Самнер-Кернл</td><td>@Model.ReadabilityPowersSumnerKearl.ToString("F2")</td></tr>
+                <tr><td>SMOG</td><td>@Model.ReadabilitySMOG.ToString("F2")</td></tr>
+            </table>
+        </div>
+    </div>
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-white">
+        <h4 class="fw-bold section-title">Символьные N‑граммы</h4>
+    </div>
+    <div class="card-body">
+        <table class="table table-sm table-bordered metric-table">
+            <tr><td>Уникальных 2‑грамм</td><td>@Model.UniqueCharBigrams</td></tr>
+            <tr><td>Всего 2‑грамм</td><td>@Model.TotalCharBigrams</td></tr>
+            <tr><td>Уникальных 3‑грамм</td><td>@Model.UniqueCharTrigrams</td></tr>
+            <tr><td>Всего 3‑грамм</td><td>@Model.TotalCharTrigrams</td></tr>
+        </table>
+    </div>
+</div>
+    <div class="mb-3 text-center">
+        <a href="javascript:history.back()" class="btn btn-secondary">Назад</a>
+    </div>
+</div>
